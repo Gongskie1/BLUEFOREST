@@ -4,7 +4,7 @@ import registerAccount from "../strategies/register-account";
 
 const UserRoutes = Router();
 
-UserRoutes.post("/", registerAccount.authenticate("local"), UserQueries.createUser);
-UserRoutes.get("/login", UserQueries.loginAccount);
+// UserRoutes.post("/", registerAccount.authenticate("local"), UserQueries.createUser);
+UserRoutes.post("/login", UserQueries.loginAccount);
 
 export default UserRoutes;

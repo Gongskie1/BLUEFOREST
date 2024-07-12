@@ -12,10 +12,7 @@ export const NavElement = [
         path:"/treatment",
         name:"Treatment"
     },
-    {
-        path:"/contact",
-        name:"Contact"
-    },
+
 ]
 
 

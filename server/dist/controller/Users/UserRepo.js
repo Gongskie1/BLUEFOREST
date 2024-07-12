@@ -68,5 +68,21 @@ class UserRepository {
             }
         });
     }
+    findUserAccount(username, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return yield this.prisma.user.findFirst({
+                    where: {
+                        username: username,
+                        password: password
+                    }
+                });
+            }
+            catch (error) {
+                console.error("Error finding user account:", error);
+                throw error;
+            }
+        });
+    }
 }
 exports.default = UserRepository;

@@ -48,5 +48,19 @@ export default class UserRepository {
         }
     }
 
+    async findUserAccount(username:string, password:string): Promise<User | null>{
+        try {
+            return await this.prisma.user.findFirst({
+                where: {
+                    username: username,
+                    password: password
+                }
+            });
+        } catch (error) {
+            console.error("Error finding user account:", error);
+            throw error;
+        }
+    }
+
     
 }

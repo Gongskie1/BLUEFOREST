@@ -14,17 +14,22 @@ const NavBar = () => {
                 </NavLink>
             </div>
             <ul
-            className="flex flex-row gap-2"
+            className="flex flex-row gap-5 items-center"
             >
                 {
                     NavElement.map((content,key) => (
                         <NavLink
                         key={key} 
-                        className={({isActive}) => `hover:text-blue-600 ${isActive ? 'border-b-2 border-blue-500' : ''}`}
+                        className={({isActive}) => `hover:text-blue-600 ${isActive ? 'border-b-2 border-blue-500' : ''} px-3`}
                         to={content.path}
                         >{content.name}</NavLink>
                     ))
                 }
+
+                <NavLink 
+                className={`hover:text-blue-600 border-green-400 border p-[6px_16px_6px_16px] rounded-md`}
+                to={"login"}
+                >Sign In</NavLink>
             </ul>
         </div>
     </nav>

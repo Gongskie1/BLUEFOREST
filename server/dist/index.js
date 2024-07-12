@@ -9,8 +9,10 @@ const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const prisma_session_store_1 = require("@quixo3/prisma-session-store");
 const client_1 = require("@prisma/client");
+const cors_1 = __importDefault(require("cors"));
 const port = 8080;
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use((0, express_session_1.default)({
     secret: "Project Sa Information Security.",

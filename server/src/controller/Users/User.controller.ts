@@ -29,20 +29,26 @@ export const UserQueries = {
     },
 
     loginAccount: async (req: Request, res: Response) => { 
+        const {body:{username,password}} = req;
         console.log("Inside the session store get");
-        // return req.user ? res.status(200).send(req.user) : res.status(401).send("Not Authenticate");
-        req.sessionStore.get(req.sessionID, (error: Error, SessionData) => {
-            if (error) {
-                console.log("This is an error occur in login controller: " + error);
-                
-                res.status(400).json({ message: "lezgoww error" });
-                throw error;
+
+        if (!username || !password) {
+            return res.status(400).json({ message: "Username and password are required" });
+        }
+
+        try {
+            const findUser = await userRepo.findUserAccount(username,password);
+
+            if(!findUser){
+                return res.status(401).json({message:"There is no user found"});                
+            }else{
+                return res.status(200).json({data:findUser});
             }
-            console.log("This is session store: ", JSON.stringify(SessionData));
-            console.log(req.sessionID);
-            return res.sendStatus(404);
-        });
-     
+        } catch (error) {
+            console.log("No user found2!",error);
+            return res.status(401).json({ message:  "An error occurred" });
+        }
+
     }
     
 }
