@@ -10,12 +10,12 @@ const endPoints = "http://localhost:8080/login";
 async function loginProcess(values: loginTypes) {
     try {
         const response = await axios.post(endPoints, values);
-        if(!response){
-            console.log("User not found");
-            return {message:"User not found"};
+        if(!response.data.status){
+            return response.data;
         }else{
             return response.data; 
         }
+        
     } catch (error) {
         if(isAxiosError(error)){
             return error.response?.data;

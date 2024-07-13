@@ -40,13 +40,21 @@ export const UserQueries = {
             const findUser = await userRepo.findUserAccount(username,password);
 
             if(!findUser){
-                return res.status(401).json({message:"There is no user found"});                
+                return res.status(401).json(
+                    {
+                        data:null, 
+                        status:false
+                    });                
             }else{
-                return res.status(200).json({data:findUser});
+                return res.status(200).json(
+                    {
+                        data:findUser, 
+                        status:true
+                    });
             }
         } catch (error) {
-            console.log("No user found2!",error);
-            return res.status(401).json({ message:  "An error occurred" });
+            console.log("Error during user login: ",error);
+            return res.status(500).json({ message: "An internal server error occurred" });
         }
 
     }

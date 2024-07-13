@@ -1,4 +1,5 @@
-import { CustomInput } from "../components"
+import { useNavigate } from "react-router-dom";
+import { CustomInput } from "../components";
 import loginProcess from "../process/logic.process";
 import loginSchema from "../schema/loginShema";
 import { initialValuesTypes } from "../types";
@@ -8,6 +9,7 @@ import { FaFacebook,FaGoogle } from "react-icons/fa";
 
 
 const LoginPage = () => {
+  const navigate = useNavigate();
 
   const initialValues = {
     username:"",
@@ -17,10 +19,11 @@ const LoginPage = () => {
   async function onSubmit(values: initialValuesTypes) {
     try {
       const findUser = await loginProcess(values);
-      if (!findUser) {
-        console.log(findUser);
+      if (!findUser.status) {
+        console.log("Incorrect credentials",findUser);
       } else {
-        console.log("No user found");
+        navigate("/")
+        console.log("correct credentials: ", findUser);
       }
     } catch (error) {
       console.log("Onsubmit login error:", error);
