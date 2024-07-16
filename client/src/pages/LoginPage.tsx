@@ -9,13 +9,14 @@ import { RootState } from "../state/store";
 import { setStatus } from "../state/counter_slice/statusSlice";
 import { useNavigate } from "react-router-dom";
 
+type UserType = "user" | "admin";
 
 
 const LoginPage = () => {
   const status = useSelector((state:RootState)=> state.status.status);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userType = "admin";
+  const userType: UserType = "user";
 
   const initialValues = {
     username:"",

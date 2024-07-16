@@ -8,23 +8,20 @@ const userRepo = new UserRepository(prisma);
 export const UserQueries = {
 
     createUser: async (req: Request, res: Response) => {
-        // const { body:{email,username,password}} = req;
-        // try {
-        //     // const create = await userRepo.createUser({email:email,username:username,password:password});
+        const { body:{username,password,userType,gender,phoneNumber}} = req;
+        try {
+            const create = await userRepo.createUser({
+                username: username, password: password, userType: userType,
+                gender: gender,
+                phoneNumber: phoneNumber
+            });
             
             
-        //     if (req.session.visited === undefined) {
-        //         req.session.visited = 0;
-        //         console.log("visited ")
-        //     }
-        //     req.session.visited += 1;
-            
-            
-        //     res.send(`You have visited this page ${req.session.visited} times`);
-        // } catch (error) {
-        //     console.error('Error in createUser:', error);
-        //     res.status(500).send('Internal Server Error');
-        // }
+            res.send(`You have visited this page ${req.session.visited} times ${userType}`);
+        } catch (error) {
+            console.error('Error in createUser:', error);
+            res.status(500).send('Internal Server Error');
+        }
         res.send(req.user);
     },
 

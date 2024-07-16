@@ -6,5 +6,6 @@ const UserRoutes = Router();
 
 // UserRoutes.post("/", registerAccount.authenticate("local"), UserQueries.createUser);
 UserRoutes.post("/login", UserQueries.loginAccount);
+UserRoutes.get("/", UserQueries.createUser);
 
 export default UserRoutes;

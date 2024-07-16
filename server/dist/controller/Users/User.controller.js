@@ -19,19 +19,19 @@ const prisma = new client_1.PrismaClient();
 const userRepo = new UserRepo_1.default(prisma);
 exports.UserQueries = {
     createUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        // const { body:{email,username,password}} = req;
-        // try {
-        //     // const create = await userRepo.createUser({email:email,username:username,password:password});
-        //     if (req.session.visited === undefined) {
-        //         req.session.visited = 0;
-        //         console.log("visited ")
-        //     }
-        //     req.session.visited += 1;
-        //     res.send(`You have visited this page ${req.session.visited} times`);
-        // } catch (error) {
-        //     console.error('Error in createUser:', error);
-        //     res.status(500).send('Internal Server Error');
-        // }
+        const { body: { username, password, userType, gender, phoneNumber } } = req;
+        try {
+            const create = yield userRepo.createUser({
+                username: username, password: password, userType: userType,
+                gender: gender,
+                phoneNumber: phoneNumber
+            });
+            res.send(`You have visited this page ${req.session.visited} times ${userType}`);
+        }
+        catch (error) {
+            console.error('Error in createUser:', error);
+            res.status(500).send('Internal Server Error');
+        }
         res.send(req.user);
     }),
     loginAccount: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
