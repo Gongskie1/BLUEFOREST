@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Footer } from "../components";
+import { Footer } from "../../components";
 
 const Home = () => {
   return (

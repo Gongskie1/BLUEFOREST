@@ -1,15 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { CustomInput } from "../components";
 import loginProcess from "../process/logic.process";
 import loginSchema from "../schema/loginShema";
 import { initialValuesTypes } from "../types";
 import useCustomFormik from "../utils/formikHooks";
 import { FaFacebook,FaGoogle } from "react-icons/fa";
+import { RootState } from "../state/store";
+import { setStatus } from "../state/counter_slice/statusSlice";
+import { useNavigate } from "react-router-dom";
 
 
 
 const LoginPage = () => {
+  const status = useSelector((state:RootState)=> state.status.status);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userType = "admin";
 
   const initialValues = {
     username:"",
@@ -20,10 +26,15 @@ const LoginPage = () => {
     try {
       const findUser = await loginProcess(values);
       if (!findUser.status) {
+        dispatch(setStatus(findUser.status));
         console.log("Incorrect credentials",findUser);
       } else {
-        navigate("/")
-        console.log("correct credentials: ", findUser);
+        dispatch(setStatus(findUser.status));
+        if(userType === "admin"){
+          navigate("/admin");
+        }else{
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       console.log("Onsubmit login error:", error);
@@ -42,7 +53,7 @@ const LoginPage = () => {
         className="bg-slate-200	 h-full flex-1 flex flex-col px-5"
         >
           <h1 className="text-blue-500 text-2xl font-medium drop-shadow-md pl-4 pt-4">Blue Forest</h1>
-          <h1 className="text-xl font-medium pb-3">Login</h1>
+          <h1 className="text-xl font-medium pb-3">Login{status.toString()}</h1>
 
           <form
           className=" mb-10 flex flex-col gap-2" 

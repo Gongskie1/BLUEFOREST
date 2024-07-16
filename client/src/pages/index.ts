@@ -1,7 +1,9 @@
-export {default as HomePage} from "./Home";
-export {default as AboutPage} from "./About";
-export {default as TreatmentPage} from "./Treatment";
-export {default as ContactPage} from "./Contact";
-export {default as AdminDashboard} from "./AdminDashboard";
-export {default as UserDashboard} from "./UserDashboard";
+export {default as HomePage} from "./landing/Home";
+export {default as AboutPage} from "./landing/About";
+export {default as TreatmentPage} from "./landing/Treatment";
+export {default as ContactPage} from "./landing/Contact";
+export {default as AdminDashboard} from "./Protected/AdminDashboard";
+export {default as UserDashboard} from "./Protected/UserDashboard";
 export {default as LoginPage} from "./LoginPage";
+export {default as LandingPage} from "./public/LandingPage";
+export {default as ProtectedRoutes} from "./Protected/ProtectedRoutes";

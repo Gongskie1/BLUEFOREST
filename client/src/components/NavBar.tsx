@@ -28,7 +28,7 @@ const NavBar = () => {
 
                 <NavLink 
                 className={`hover:text-blue-600 border-green-400 border p-[6px_16px_6px_16px] rounded-md`}
-                to={"login"}
+                to={"/login"}
                 >Sign In</NavLink>
             </ul>
         </div>

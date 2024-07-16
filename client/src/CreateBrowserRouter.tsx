@@ -1,38 +1,44 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "./App";
-import { AboutPage, AdminDashboard, HomePage, LoginPage, TreatmentPage, UserDashboard } from "./pages";
+import { AboutPage, AdminDashboard, HomePage, LandingPage, LoginPage, ProtectedRoutes, TreatmentPage, UserDashboard } from "./pages";
 
-export const router = createBrowserRouter([
+const router = createBrowserRouter([
+    // Public routes
     {
-        path:"/",
-        element: <App />,
+        path: "/",
+        element: <LandingPage />,
         children: [
             {
-                path:"",
-                element: <HomePage/>
+                path: "",
+                element: <HomePage />
             },
             {
-                path:"about",
-                element: <AboutPage/>
+                path: "about",
+                element: <AboutPage />
             },
             {
-                path:"treatment",
-                element: <TreatmentPage/>
-            },
-            
-        ],
-        
+                path: "treatment",
+                element: <TreatmentPage />
+            }
+        ]
     },
     {
-        path:"/login",
-        element: <LoginPage/>
+        path: "/login",
+        element: <LoginPage />
     },
     {
-        path:"user-dashboard",
-        element: <UserDashboard/>
+        path: "/dashboard",
+        element: <ProtectedRoutes children={<UserDashboard />} />
     },
     {
-        path:"admin-dashboard",
-        element: <AdminDashboard/>
+        path: "/admin",
+        element: <ProtectedRoutes children={<AdminDashboard />} />
+    },
+    {
+        path: "*",
+        element: <div>Page not found</div>
     }
-])
+]);
+
+
+
+export default router;
