@@ -18,6 +18,7 @@ CREATE TABLE `Schedule` (
     `firstname` VARCHAR(191) NOT NULL,
     `lastname` VARCHAR(191) NOT NULL,
     `phoneNumber` VARCHAR(191) NOT NULL,
+    `schedule` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `therapyType` VARCHAR(191) NOT NULL,

@@ -15,47 +15,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserQueries = void 0;
 const client_1 = require("@prisma/client");
 const UserRepo_1 = __importDefault(require("./UserRepo"));
+const bcrypt_1 = require("../../utils/bcrypt");
 const prisma = new client_1.PrismaClient();
 const userRepo = new UserRepo_1.default(prisma);
 exports.UserQueries = {
     createUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { body: { username, password, userType, gender, phoneNumber } } = req;
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json({ message: "Please fill all the fields." });
+        }
         try {
-            const create = yield userRepo.createUser({
-                username: username, password: password, userType: userType,
-            });
-            res.send(`You have visited this page ${req.session.visited} times ${userType}`);
+            const findUser = yield userRepo.findUserByUsername(username);
+            if (!findUser) {
+                const hash = yield (0, bcrypt_1.hashPassword)(password);
+                yield userRepo.createUser({ username, password: hash });
+                return res.status(201).json({ message: "User created" });
+            }
+            else {
+                return res.status(400).json({ message: "User already exists" });
+            }
         }
         catch (error) {
-            console.error('Error in createUser:', error);
-            res.status(500).send('Internal Server Error');
+            console.error("Error in createUser:", error);
+            return res.status(500).send("Internal Server Error");
         }
-        res.send(req.user);
     }),
     loginAccount: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { body: { username, password } } = req;
+        const { username, password } = req.body;
         console.log("Inside the session store get");
         if (!username || !password) {
             return res.status(400).json({ message: "Username and password are required" });
         }
         try {
-            const findUser = yield userRepo.findUserAccount(username, password);
-            if (!findUser) {
-                return res.status(401).json({
-                    data: null,
-                    status: false
-                });
+            const findUser = yield userRepo.findUserByUsername(username);
+            if (findUser) {
+                const compare = yield (0, bcrypt_1.checkHashPassword)(findUser.password, password);
+                if (!compare) {
+                    return res.status(401).json({ message: "Wrong credentials", user: null });
+                }
+                else {
+                    return res.status(200).json({ message: "Login successful", user: findUser });
+                }
             }
             else {
-                return res.status(200).json({
-                    data: findUser,
-                    status: true
-                });
+                return res.status(404).json({ message: "User not found" });
             }
         }
         catch (error) {
-            console.log("Error during user login: ", error);
+            console.log("Error during user login:", error);
             return res.status(500).json({ message: "An internal server error occurred" });
         }
-    })
+    }),
 };

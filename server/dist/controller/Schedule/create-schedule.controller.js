@@ -8,18 +8,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
-const UserRepo_1 = __importDefault(require("../Users/UserRepo"));
 const prisma = new client_1.PrismaClient();
-const userRepo = new UserRepo_1.default(prisma);
 const scheduleController = {
     create: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { body: { gender, firstname, lastname, phoneNumber, therapyType } } = req;
-        console.log(gender, firstname, lastname, phoneNumber, therapyType);
-    })
+        const { gender, firstname, lastname, phoneNumber, therapyType, schedule } = req.body;
+        const scheduleData = {
+            data: {
+                gender: gender,
+                userId: 1,
+                firstname: firstname,
+                lastname: lastname,
+                phoneNumber: phoneNumber,
+                schedule: schedule,
+                therapyType: therapyType,
+            },
+        };
+        // ghena check niya if naay input na empty
+        if (!gender || !firstname || !lastname || phoneNumber || therapyType || schedule) {
+            return res.status(400).json({ message: "fill all the inputs" });
+        }
+        // dri mahitabo pag create ug schedule
+        try {
+            // mao ning ORM sa prisma naga communicate sa mysql
+            const create = yield prisma.schedule.create(scheduleData);
+            res.status(200).json({ message: "created" });
+        }
+        catch (error) {
+            console.error("Error creating schedule:", error);
+            res.status(500).send({ error: "Failed to create schedule" });
+        }
+    }),
 };
 exports.default = scheduleController;
