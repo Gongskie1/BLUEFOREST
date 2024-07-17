@@ -5,7 +5,7 @@ export type customInputTypes = {
     inputTitle:string;
     inputID?:string;
     inputClass?:string;
-    boilerPlate: FieldInputProps<string>;
+    boilerPlate?: FieldInputProps<string>;
 }
 
 export type initialValuesTypes = {

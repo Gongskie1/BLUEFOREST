@@ -23,8 +23,6 @@ exports.UserQueries = {
         try {
             const create = yield userRepo.createUser({
                 username: username, password: password, userType: userType,
-                gender: gender,
-                phoneNumber: phoneNumber
             });
             res.send(`You have visited this page ${req.session.visited} times ${userType}`);
         }

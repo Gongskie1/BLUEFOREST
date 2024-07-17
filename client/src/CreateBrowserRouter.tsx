@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AboutPage, AdminDashboard, HomePage, LandingPage, LoginPage, ProtectedRoutes, TreatmentPage, UserDashboard } from "./pages";
+import CreateAccountPage from "./pages/CreateAccountPage";
 
 const router = createBrowserRouter([
     // Public routes
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
     {
         path: "/login",
         element: <LoginPage />
+    },
+    {
+        path: "/create-account",
+        element: <CreateAccountPage />
     },
     {
         path: "/dashboard",

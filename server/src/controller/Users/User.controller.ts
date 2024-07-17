@@ -12,8 +12,6 @@ export const UserQueries = {
         try {
             const create = await userRepo.createUser({
                 username: username, password: password, userType: userType,
-                gender: gender,
-                phoneNumber: phoneNumber
             });
             
             
