@@ -5,5 +5,6 @@ const schedule = Router();
 
 
 schedule.post("/schedule", scheduleController.create);
+schedule.get("/schedule/:id", scheduleController.display);
 
 export default schedule;

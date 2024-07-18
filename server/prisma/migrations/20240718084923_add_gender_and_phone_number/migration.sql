@@ -12,7 +12,7 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Schedule` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `status` VARCHAR(191) NOT NULL DEFAULT 'accepted',
+    `status` BOOLEAN NOT NULL DEFAULT false,
     `userId` INTEGER NOT NULL,
     `gender` VARCHAR(191) NOT NULL,
     `firstname` VARCHAR(191) NOT NULL,
@@ -23,7 +23,6 @@ CREATE TABLE `Schedule` (
     `updatedAt` DATETIME(3) NOT NULL,
     `therapyType` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `Schedule_phoneNumber_key`(`phoneNumber`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

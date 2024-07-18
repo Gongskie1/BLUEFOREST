@@ -1,8 +1,20 @@
+import { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../state/store";
 import createSchedule from "../../../process/create-schedule.process";
+import axios from 'axios';
+
+type ScheduleType = {
+  id: number;
+  firstname: string;
+  lastname: string;
+  gender: string;
+  phoneNumber: string;
+  schedule: string;
+  status:string;
+};
 
 type initialValuesTypes = {
   userId: number;
@@ -17,6 +29,7 @@ type initialValuesTypes = {
 const UserDashboard = () => {
   const userId = useSelector((state: RootState) => state.userData.id);
   const username = useSelector((state: RootState) => state.userData.username);
+  const [schedules, setSchedules] = useState<ScheduleType[]>([]);
 
   const initialValues: initialValuesTypes = {
     userId,
@@ -39,14 +52,46 @@ const UserDashboard = () => {
 
   const handleSubmit = async (values: initialValuesTypes, actions: FormikHelpers<initialValuesTypes>) => {
     const response = await createSchedule(values);
-    console.log(response);
-    if (response.message === "Schedule created successfully") {
-      alert("Schedule created successfully");
-    } else {
+    // console.log(response);
+    if (response.status === 'success') {
       alert(response.message);
+      fetchSchedules(userId); // Fetch schedules after successfully creating a new schedule
+    } else {
+      alert(response.message || 'An error occurred');
     }
+    actions.setSubmitting(false);
     actions.resetForm();
   };
+
+  const fetchSchedules = async (userId: number) => {
+    try {
+      const response = await axios.get(`http://localhost:8080/schedule/${userId}`);
+      const { status, message, data } = response.data;
+
+      if (status === 'success') {
+        if (data.length === 0) {
+          console.log(message); 
+        } else {
+          setSchedules(data);
+          console.log(JSON.stringify(schedules));
+        }
+      } else {
+        console.error(message); 
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        
+        console.error('Error fetching schedules:', error.response?.data?.message || error.message);
+      } else {
+        
+        console.error('Error fetching schedules:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules(userId); // Fetch schedules when the component mounts
+  }, [userId]);
 
   return (
     <div className="flex h-screen">
@@ -167,15 +212,16 @@ const UserDashboard = () => {
       <div className="w-3/4 p-6">
         {/* Schedule Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* {initialScheduleItems.map((item) => (
-            <div key={item.id} className="border p-4 text-sm shadow-lg bg-white rounded-md">
-              <p className="text-gray-800 font-semibold">Name: {item.name}</p>
-              <p className="text-gray-600">Gender: {item.gender}</p>
-              <p className="text-gray-600">CelNo: {item.celNo}</p>
-              <p className="text-gray-600">Schedule: {item.schedule}</p>
-              <p className="text-gray-600">Status: {item.status}</p>
+        {schedules.map((schedule) => (
+            <div key={schedule.id} className="border p-4 text-sm shadow-lg bg-white rounded-md">
+              <p className="text-gray-800 font-semibold">Name: {schedule.firstname} {schedule.lastname}</p>
+              <p className="text-gray-600">Gender: {schedule.gender}</p>
+              <p className="text-gray-600">Phone Number: {schedule.phoneNumber}</p>
+              <p className="text-gray-600">DateTime: {schedule.schedule}</p>
+              <p className="text-gray-600">status: {schedule.status}</p>
             </div>
-          ))} */}
+          ))
+        }
         </div>
       </div>
       {/* End of Main Content */}

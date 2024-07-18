@@ -15,14 +15,10 @@ const scheduleUri = "http://localhost:8080/schedule";
 async function createSchedule(values: initialValuesTypes) {
   try {
     const response = await axios.post(scheduleUri, values);
-    if (response.data && response.data.status) {
-      return { message: response.data.message };
-    } else {
-      return { message: "Error" };
-    }
+    return response.data; // Return the entire response data
   } catch (error) {
     if (isAxiosError(error)) {
-      return { message: error.response?.data.message || "An error occurred" };
+      return error.response?.data || { status: 'error', message: 'An error occurred' };
     } else {
       throw error;
     }

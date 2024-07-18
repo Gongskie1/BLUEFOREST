@@ -34,6 +34,34 @@ const scheduleController = {
       res.status(500).json({ status: false, message: "Failed to create schedule" });
     }
   },
+
+  display: async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
+  
+    try {
+      const schedules = await prisma.schedule.findMany({ where: { userId: id } });
+  
+      if (schedules.length === 0) {
+        return res.status(200).json({
+          status: 'success',
+          message: 'No schedules found',
+          data: [],
+        });
+      } else {
+        return res.status(200).json({
+          status: 'success',
+          message: 'Schedules retrieved successfully',
+          data: schedules,
+        });
+      }
+    } catch (error) {
+      console.error('Error retrieving schedules:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to retrieve schedules',
+      });
+    }
+  }
 };
 
 export default scheduleController;
