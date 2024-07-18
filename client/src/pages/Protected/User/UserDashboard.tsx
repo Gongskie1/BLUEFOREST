@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../state/store";
+// import { useSelector } from "react-redux";
+// import { RootState } from "../../../state/store";
 import createSchedule from "../../../process/create-schedule.process";
 import axios from 'axios';
 
@@ -16,6 +16,12 @@ type ScheduleType = {
   status:string;
 };
 
+type user = {
+  id:number;
+  username:string;
+  userType:string;
+}
+
 type initialValuesTypes = {
   userId: number;
   therapyType: string;
@@ -27,11 +33,14 @@ type initialValuesTypes = {
 };
 
 const UserDashboard = () => {
-  const userId = useSelector((state: RootState) => state.userData.id);
-  const username = useSelector((state: RootState) => state.userData.username);
+  // const userId = useSelector((state: RootState) => state.userData.id);
+  // const username = useSelector((state: RootState) => state.userData.username);
   const [schedules, setSchedules] = useState<ScheduleType[]>([]);
-
+  const userDataString = localStorage.getItem("data");
+  const userData:user = userDataString ? JSON.parse(userDataString) : null;
+  const userId = userData.id;
   const initialValues: initialValuesTypes = {
+    
     userId,
     therapyType: "",
     phoneNumber: "",
@@ -64,6 +73,7 @@ const UserDashboard = () => {
   };
 
   const fetchSchedules = async (userId: number) => {
+    
     try {
       const response = await axios.get(`http://localhost:8080/schedule/${userId}`);
       const { status, message, data } = response.data;
@@ -89,15 +99,21 @@ const UserDashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   useEffect(() => {
-    fetchSchedules(userId); // Fetch schedules when the component mounts
+    fetchSchedules(userId);
   }, [userId]);
 
   return (
     <div className="flex h-screen">
+      
       {/* Sidebar */}
       <div className="w-1/4 bg-gray-100 p-6">
-        <h1 className="text-2xl font-bold mb-4">{`${username} ${userId}`}</h1>
+        {/* <h1 className="text-2xl font-bold mb-4">{`${username} ${userId}`}</h1> */}
 
         {/* Create Schedule Form in Sidebar */}
         <div className="bg-gray-200 p-6">
@@ -204,6 +220,15 @@ const UserDashboard = () => {
               </Form>
             )}
           </Formik>
+          
+        </div>
+        <div className="mt-4">
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-4 py-2 rounded-md text-white hover:bg-red-600 w-full"
+          >
+            Logout
+          </button>
         </div>
       </div>
       {/* End of Sidebar */}

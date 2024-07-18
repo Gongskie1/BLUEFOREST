@@ -1,6 +1,6 @@
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { RootState } from "../../state/store";
+// import { RootState } from "../../state/store";
 import { ReactNode } from "react";
 
 type ElementTypeProps = {
@@ -8,9 +8,11 @@ type ElementTypeProps = {
 }
 
 const ProtectedRoutes = ({ children }:ElementTypeProps) => {
-  const isAuthenticated = useSelector((state: RootState) => state.status.status);
+  const statusString = localStorage.getItem("status");
+  const statusBoolean = statusString === "true";
+  // const isAuthenticated = useSelector((state: RootState) => state.status.status);
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return statusBoolean ? children : <Navigate to="/login" />;
 };
 
 export default ProtectedRoutes;

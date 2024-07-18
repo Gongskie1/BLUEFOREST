@@ -1,77 +1,131 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as LineTooltip,
+  Legend as LineLegend,
+} from "recharts";
+
+interface Schedule {
+  id: number;
+  firstname: string;
+  lastname: string;
+  schedule: string;
+  status: string;
+  gender: string;
+}
 
 const AdminDashboard = () => {
-  const [schedules, setSchedules] = useState([
-    { id: 1, name: "John Doe", dateTime: "2024-05-10T13:00", status: "Pending" },
-    { id: 2, name: "Jane Smith", dateTime: "2024-05-11T14:00", status: "Accepted" },
-    { id: 3, name: "Alice Johnson", dateTime: "2024-05-12T15:00", status: "Pending" },
-    { id: 4, name: "Bob Brown", dateTime: "2024-05-13T16:00", status: "Accepted" },
-    { id: 5, name: "Charlie White", dateTime: "2024-05-14T17:00", status: "Pending" },
-  ]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [genderData, setGenderData] = useState<{ gender: string; value: number }[]>([]);
+  const [acceptanceData, setAcceptanceData] = useState<{ status: string; count: number }[]>([]);
 
   useEffect(() => {
-    
+    fetchSchedules();
   }, []);
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get("/api/schedules");
-      setSchedules(response.data); // Assuming data is in an array format
+      const response = await axios.get<{ data: Schedule[] }>("http://localhost:8080/schedule");
+      const { data } = response.data;
+
+      if (data.length > 0) {
+        setSchedules(data);
+
+        // Process gender data for Pie Chart
+        const genderCounts = countGender(data);
+        setGenderData(genderCounts);
+
+        // Process acceptance data for Line Chart
+        const acceptanceCounts = countAcceptance(data);
+        setAcceptanceData(acceptanceCounts);
+      } else {
+        console.log("No schedules found");
+      }
     } catch (error) {
       console.error("Error fetching schedules:", error);
     }
   };
 
-  const handleAcceptSchedule = async (scheduleId:number) => {
+  // Helper function to count gender distribution
+  const countGender = (data: Schedule[]): { gender: string; value: number }[] => {
+    const counts: { [key: string]: number } = {};
+    data.forEach((schedule) => {
+      counts[schedule.gender] = counts[schedule.gender] ? counts[schedule.gender] + 1 : 1;
+    });
+    return Object.keys(counts).map((gender) => ({ gender, value: counts[gender] }));
+  };
+
+  // Helper function to count acceptance status
+  const countAcceptance = (data: Schedule[]): { status: string; count: number }[] => {
+    const counts: { [key: string]: number } = {};
+    data.forEach((schedule) => {
+      counts[schedule.status] = counts[schedule.status] ? counts[schedule.status] + 1 : 1;
+    });
+    return Object.keys(counts).map((status) => ({ status, count: counts[status] }));
+  };
+
+  // Colors for the Pie Chart
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+  // Function to accept a schedule
+  const handleAcceptSchedule = async (scheduleId: number) => {
     try {
-      // Example: Call API to accept schedule
-      await axios.put(`/api/schedules/${scheduleId}/accept`);
-      // Update local state or fetch schedules again
-      fetchSchedules();
+      await axios.put(`http://localhost:8080/schedule/${scheduleId}/accept`);
+      fetchSchedules(); // Refresh schedules after update
     } catch (error) {
       console.error("Error accepting schedule:", error);
     }
   };
 
-  const handleDeleteSchedule = async (scheduleId:number) => {
+  // Function to delete a schedule
+  const handleDeleteSchedule = async (scheduleId: number) => {
     try {
-      // Example: Call API to delete schedule
-      await axios.delete(`/api/schedules/${scheduleId}`);
-      // Update local state or fetch schedules again
-      fetchSchedules();
+      await axios.delete(`http://localhost:8080/schedule/${scheduleId}`); // Adjust the URL as per your backend route
+      fetchSchedules(); // Refresh schedules after delete
     } catch (error) {
       console.error("Error deleting schedule:", error);
     }
   };
 
-  // Dummy data for Recharts line chart
-  const chartData = [
-    { name: 'Jan', created: 20, accepted: 15 },
-    { name: 'Feb', created: 25, accepted: 18 },
-    { name: 'Mar', created: 30, accepted: 20 },
-    { name: 'Apr', created: 35, accepted: 25 },
-    { name: 'May', created: 40, accepted: 30 },
-    { name: 'Jun', created: 45, accepted: 35 },
-    { name: 'Jul', created: 50, accepted: 40 },
-    { name: 'Aug', created: 55, accepted: 45 },
-    { name: 'Sep', created: 60, accepted: 50 },
-    { name: 'Oct', created: 65, accepted: 55 },
-    { name: 'Nov', created: 70, accepted: 60 },
-    { name: 'Dec', created: 75, accepted: 65 },
-  ];
+  // Function to handle logout
+  const handleLogout = () => {
+    // Implement your logout logic here, such as clearing authentication tokens or state
+    // For simplicity, we'll just reload the page to simulate logout
+    localStorage.clear()
+    window.location.reload();
+  };
 
   return (
     <div className="flex w-full h-screen">
-      {/* List of Schedules */}
-      <div className="w-3/4 p-6">
-        <h1 className="text-2xl font-bold mb-4">Schedule Management</h1>
+      {/* Logout Button */}
+      <button
+        onClick={handleLogout}
+        className="absolute top-4 right-4 bg-red-500 px-4 py-2 rounded-md text-white hover:bg-red-600"
+      >
+        Logout
+      </button>
+
+      {/* Schedule List */}
+      <div className="w-1/2 p-6">
+        <h1 className="text-2xl font-bold mb-4">Schedule List</h1>
         <div className="overflow-y-auto max-h-screen">
           {schedules.map((schedule) => (
             <div key={schedule.id} className="border p-4 mb-4 rounded-md shadow">
-              <p className="font-semibold">Name: {schedule.name}</p>
-              <p className="text-gray-600">Schedule: {schedule.dateTime}</p>
+              <p className="font-semibold">
+                Name: {schedule.firstname} {schedule.lastname}
+              </p>
+              <p className="text-gray-600">Schedule: {schedule.schedule}</p>
               <p className="text-gray-600">Status: {schedule.status}</p>
               <div className="mt-2">
                 <button
@@ -92,20 +146,47 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Data Visualization */}
-      <div className="w-1/4 p-6">
-        <h1 className="text-2xl font-bold mb-4">Schedule Trends</h1>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="created" stroke="#8884d8" activeDot={{ r: 8 }} />
-            <Line type="monotone" dataKey="accepted" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
+      {/* Charts Section */}
+      <div className="w-1/2 p-6">
+        {/* Pie Chart - Gender Distribution */}
+        <div>
+          <h1 className="text-2xl font-bold mb-4">Gender Distribution</h1>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={genderData}
+                dataKey="value"
+                nameKey="gender"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                fill="#8884d8"
+                label
+              >
+                {genderData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Line Chart - Accepted Schedules Over Time */}
+        <div className="mt-8">
+          <h1 className="text-2xl font-bold mb-4">Accepted Schedules Over Time</h1>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={acceptanceData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="status" />
+              <YAxis />
+              <Line type="monotone" dataKey="count" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <LineTooltip />
+              <LineLegend />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

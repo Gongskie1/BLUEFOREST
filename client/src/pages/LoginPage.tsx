@@ -1,14 +1,17 @@
 import { useDispatch } from "react-redux";
 import { CustomInput } from "../components";
-import loginProcess from "../process/logic.process";
+import { loginProcess } from "../process/logic.process";
 import loginSchema from "../schema/loginShema";
 import { initialValuesTypes } from "../types";
-import useCustomFormik from "../utils/formikHooks";
+import { Formik, Form, ErrorMessage, FormikHelpers } from "formik";
 import { setStatus } from "../state/counter_slice/statusSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { setData } from "../state/counter_slice/userSlice";
 
-// type UserType = "user" | "admin";
+type InitialValuesTypes = {
+  username: string;
+  password: string;
+};
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -19,61 +22,80 @@ const LoginPage = () => {
     password: "",
   };
 
-  async function onSubmit(values: initialValuesTypes) {
+  const onSubmit = async (values: initialValuesTypes, actions: FormikHelpers<InitialValuesTypes>) => {
+    
     try {
       const findUser = await loginProcess(values);
       if (!findUser) {
         dispatch(setStatus(false));
         console.log("Incorrect credentials", findUser);
-        navigate("/login");
+        alert("Incorrect credentials");
+        actions.resetForm(); // Reset form fields
       } else {
-        dispatch(setStatus(true));
-        dispatch(setData(findUser.data));
-        // Set the entire user data object
+        localStorage.setItem("status", "true");
+        localStorage.setItem("data", JSON.stringify(findUser.data));
+        const statusString = localStorage.getItem("status");
+        const statusBoolean = statusString === "true";
+        const userDataString = localStorage.getItem("data");
+        const userData = userDataString ? JSON.parse(userDataString) : null;
+        console.log(userData);
+        // const jsonData = JSON.parse(userData);
+        dispatch(setStatus(statusBoolean));
+        dispatch(setData(userData));
         if (findUser.data.userType === "ADMIN") {
           navigate("/admin");
         } else {
           navigate("/dashboard");
         }
-       console.log("This is else",findUser.data.userType);
+        console.log("This is else", findUser.data.userType);
       }
     } catch (error) {
       console.log("Onsubmit login error:", error);
     }
-  }
-
-  const { getFieldProps, touched, errors, handleSubmit } = useCustomFormik(
-    initialValues,
-    loginSchema,
-    onSubmit
-  );
+  };
 
   return (
     <div className="h-screen flex justify-center items-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg w-3/4 lg:w-2/4 flex overflow-hidden">
-        <div className="w-full lg:w-1/2 bg-gradient-to-r from-green-500 to-blue-500 p-8 flex flex-col justify-center">
-          <h1 className="text-white text-4xl font-bold mb-4">Blue Forest</h1>
-          <h2 className="text-white text-2xl mb-6">Login</h2>
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <CustomInput inputTitle={"username"} boilerPlate={getFieldProps("username")} />
-            {touched.username && errors.username && (
-              <div className="text-red-500">{errors.username}</div>
-            )}
+        <div className="w-full p-8 flex flex-col justify-center">
+          <h1 className="text-blue-500 text-4xl font-bold mb-4">Blue Forest</h1>
+          <h2 className="text-2xl mb-6">Login</h2>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={loginSchema}
+            onSubmit={onSubmit}
+          >
+            {({ getFieldProps }) => (
+              <Form className="space-y-6">
+                <div>
+                  <CustomInput inputTitle={"username"} boilerPlate={getFieldProps("username")} />
+                  <ErrorMessage name="username" component="div" className="text-red-500" />
+                </div>
 
-            <CustomInput inputTitle={"password"} boilerPlate={getFieldProps("password")} />
-            {touched.password && errors.password && (
-              <div className="text-red-500">{errors.password}</div>
-            )}
+                <div>
+                  <CustomInput inputTitle={"password"} boilerPlate={getFieldProps("password")} />
+                  <ErrorMessage name="password" component="div" className="text-red-500" />
+                </div>
 
+                <button
+                  type="submit"
+                  className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-all"
+                >
+                  Login
+                </button>
+              </Form>
+            )}
+          </Formik>
+          <div className="mt-6 flex justify-between items-center">
+            <p className="text-black">
+              Don't have an account? <Link to="/create-account" className="underline">Create Account</Link>
+            </p>
             <button
-              type="submit"
-              className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-all"
+              onClick={() => navigate("/")}
+              className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-all"
             >
-              Login
+              Home
             </button>
-          </form>
-          <div className="mt-6">
-            <p className="text-white">Don't have an account? <Link to="/create-account" className="underline">Create Account</Link></p>
           </div>
         </div>
       </div>

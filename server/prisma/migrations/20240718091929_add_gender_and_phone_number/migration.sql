@@ -12,7 +12,7 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Schedule` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `status` BOOLEAN NOT NULL DEFAULT false,
+    `status` VARCHAR(191) NOT NULL DEFAULT 'Pending',
     `userId` INTEGER NOT NULL,
     `gender` VARCHAR(191) NOT NULL,
     `firstname` VARCHAR(191) NOT NULL,

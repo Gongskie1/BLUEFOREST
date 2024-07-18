@@ -22,22 +22,22 @@ exports.UserQueries = {
     createUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const { username, password } = req.body;
         if (!username || !password) {
-            return res.status(400).json({ message: "Please fill all the fields." });
+            return res.status(400).json({ status: false, message: "Please fill all the fields." });
         }
         try {
             const findUser = yield userRepo.findUserByUsername(username);
             if (!findUser) {
                 const hash = yield (0, bcrypt_1.hashPassword)(password);
                 yield userRepo.createUser({ username, password: hash });
-                return res.status(201).json({ message: "User created" });
+                return res.status(201).json({ status: true, message: "User created" });
             }
             else {
-                return res.status(400).json({ message: "User already exists" });
+                return res.status(400).json({ status: false, message: "User already exists" });
             }
         }
         catch (error) {
             console.error("Error in createUser:", error);
-            return res.status(500).send("Internal Server Error");
+            return res.status(500).json({ status: false, message: "Internal Server Error" });
         }
     }),
     loginAccount: (req, res) => __awaiter(void 0, void 0, void 0, function* () {

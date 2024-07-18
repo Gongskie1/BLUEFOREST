@@ -1,21 +1,21 @@
 import { useDispatch } from "react-redux";
 import { CustomInput } from "../components";
-import createAccountProcess from "../process/logic.process";
+import { createAccount } from "../process/logic.process";
 import * as Yup from "yup";
-import { Formik, Form, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage, FormikHelpers } from "formik";
 import { useNavigate } from "react-router-dom";
 import { setStatus } from "../state/counter_slice/statusSlice";
 
 type InitialValuesTypes = {
-    username:string;
-    password:string;
-}
+  username: string;
+  password: string;
+};
 
 const CreateAccountPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const initialValues = {
+  const initialValues: InitialValuesTypes = {
     username: "",
     password: "",
   };
@@ -27,15 +27,17 @@ const CreateAccountPage = () => {
       .min(6, "Password must be at least 6 characters"),
   });
 
-  const onSubmit = async (values:InitialValuesTypes) => {
+  const onSubmit = async (values: InitialValuesTypes, actions: FormikHelpers<InitialValuesTypes>) => {
     try {
-      const newUser = await createAccountProcess(values);
+      const newUser = await createAccount(values);
       if (newUser.status) {
         dispatch(setStatus(newUser.status));
         navigate("/dashboard");
       } else {
-        console.log("Account creation failed", newUser);
-        navigate("/dashboard");
+        console.log("Account creation failed", newUser.message);
+        alert(newUser.message);
+        actions.resetForm();
+        navigate("/create-account");
       }
     } catch (error) {
       console.log("Onsubmit create account error:", error);
@@ -56,12 +58,12 @@ const CreateAccountPage = () => {
             {({ getFieldProps }) => (
               <Form className="space-y-6">
                 <div>
-                  <CustomInput inputTitle={"username"} boilerPlate={getFieldProps("username")} />
+                  <CustomInput inputTitle="username" boilerPlate={getFieldProps("username")} />
                   <ErrorMessage name="username" component="div" className="text-red-500" />
                 </div>
 
                 <div>
-                  <CustomInput inputTitle={"password"} boilerPlate={getFieldProps("password")} />
+                  <CustomInput inputTitle="password" boilerPlate={getFieldProps("password")} />
                   <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
 
@@ -74,6 +76,17 @@ const CreateAccountPage = () => {
               </Form>
             )}
           </Formik>
+          <div className="mt-6 flex justify-between items-center">
+            <p className="text-black">
+              Already have an account? <button onClick={() => navigate("/login")} className="underline">Login</button>
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-all"
+            >
+              Home
+            </button>
+          </div>
         </div>
       </div>
     </div>

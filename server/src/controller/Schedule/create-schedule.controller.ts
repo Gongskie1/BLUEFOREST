@@ -61,7 +61,91 @@ const scheduleController = {
         message: 'Failed to retrieve schedules',
       });
     }
-  }
+  },
+
+  displayAll: async (req: Request, res: Response) => {
+    try {
+      const schedules = await prisma.schedule.findMany();
+      
+      if (schedules.length === 0) {
+        return res.status(200).json({
+          status: 'success',
+          message: 'No schedules found',
+          data: [],
+        });
+      } else {
+        return res.status(200).json({
+          status: 'success',
+          message: 'All schedules retrieved successfully',
+          data: schedules,
+        });
+      }
+    } catch (error) {
+      console.error('Error retrieving all schedules:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to retrieve all schedules',
+      });
+    }
+  },
+
+  acceptSchedule: async (req: Request, res: Response) => {
+    const scheduleId = parseInt(req.params.id, 10);
+
+    try {
+      // Update schedule status to "Accepted"
+      const updatedSchedule = await prisma.schedule.update({
+        where: { id: scheduleId },
+        data: { status: "Accepted" },
+      });
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Schedule accepted successfully',
+        data: updatedSchedule,
+      });
+    } catch (error) {
+      console.error('Error accepting schedule:', error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to accept schedule',
+      });
+    }
+  },
+
+  deleteSchedule: async (req: Request, res: Response) => {
+    const scheduleId = parseInt(req.params.id, 10);
+
+    try {
+      // Check if the schedule exists
+      const existingSchedule = await prisma.schedule.findUnique({
+        where: { id: scheduleId },
+      });
+
+      if (!existingSchedule) {
+        return res.status(404).json({
+          status: "error",
+          message: `Schedule with ID ${scheduleId} not found`,
+        });
+      }
+
+      // Delete the schedule
+      await prisma.schedule.delete({
+        where: { id: scheduleId },
+      });
+
+      return res.status(200).json({
+        status: "success",
+        message: `Schedule with ID ${scheduleId} deleted successfully`,
+      });
+    } catch (error) {
+      console.error("Error deleting schedule:", error);
+      return res.status(500).json({
+        status: "error",
+        message: "Failed to delete schedule",
+      });
+    }
+  },
 };
 
 export default scheduleController;

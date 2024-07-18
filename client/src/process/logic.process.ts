@@ -26,4 +26,20 @@ async function loginProcess(values: loginTypes) {
     }
 }
 
-export default loginProcess;
+
+const createAccount = async (values: loginTypes) => {
+    try {
+      const response = await axios.post("http://localhost:8080/register", values);
+      return response.data;  // Return the data directly
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return error.response?.data;  // Return the error response data directly
+      } else {
+        throw error;
+      }
+    }
+  };
+  
+ 
+
+export  {loginProcess,createAccount};

@@ -33,7 +33,7 @@ model User {
 
 model Schedule {
   id          Int      @id @default(autoincrement())
-  status      Boolean  @default(false)
+  status      String   @default("Pending")
   userId      Int
   gender      String
   firstname   String
