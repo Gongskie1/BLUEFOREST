@@ -48,17 +48,22 @@ exports.UserQueries = {
         }
         try {
             const findUser = yield userRepo.findUserByUsername(username);
+            const data = {
+                id: findUser === null || findUser === void 0 ? void 0 : findUser.id,
+                username: findUser === null || findUser === void 0 ? void 0 : findUser.username,
+                userType: findUser === null || findUser === void 0 ? void 0 : findUser.userType
+            };
             if (findUser) {
                 const compare = yield (0, bcrypt_1.checkHashPassword)(findUser.password, password);
                 if (!compare) {
                     return res.status(401).json({ message: "Wrong credentials", user: null });
                 }
                 else {
-                    return res.status(200).json({ message: "Login successful", user: findUser });
+                    return res.status(200).json({ message: "Login successful", user: data });
                 }
             }
             else {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(404).json({ message: "User not found", user: null });
             }
         }
         catch (error) {

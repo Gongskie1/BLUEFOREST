@@ -1,47 +1,58 @@
-import { useState } from "react";
-import { Formik, Form, Field, ErrorMessage,FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../state/store";
+import createSchedule from "../../../process/create-schedule.process";
 
 type initialValuesTypes = {
-  therapyType:string;
-  phoneNumber:string;
+  userId: number;
+  therapyType: string;
+  phoneNumber: string;
   dateTime: string;
-}
+  firstName: string;
+  lastName: string;
+  gender: string;
+};
 
 const UserDashboard = () => {
-  const [scheduleItems, setScheduleItems] = useState([]);
+  const userId = useSelector((state: RootState) => state.userData.id);
+  const username = useSelector((state: RootState) => state.userData.username);
 
-  const initialScheduleItems = [
-    { id: 1, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-    { id: 2, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-    { id: 3, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-    { id: 4, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-    { id: 5, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-    { id: 6, name: "Mark Joseph Tiempo", gender: "Male", celNo: "09816442772", schedule: "May 10 - 1pm", status: "Accepted" },
-  ];
-
-  const initialValues = {
+  const initialValues: initialValuesTypes = {
+    userId,
     therapyType: "",
     phoneNumber: "",
     dateTime: "",
+    firstName: "",
+    lastName: "",
+    gender: "",
   };
 
   const validationSchema = Yup.object({
     therapyType: Yup.string().required("Therapy Type is required"),
     phoneNumber: Yup.string().required("Phone Number is required"),
     dateTime: Yup.date().required("Date and Time are required").nullable(),
+    firstName: Yup.string().required("First Name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    gender: Yup.string().required("Gender is required"),
   });
 
-  const handleSubmit = async (values: initialValuesTypes,actions: FormikHelpers<initialValuesTypes>) => {
-    console.log("Form values:", values);
-    actions.resetForm()
+  const handleSubmit = async (values: initialValuesTypes, actions: FormikHelpers<initialValuesTypes>) => {
+    const response = await createSchedule(values);
+    console.log(response);
+    if (response.message === "Schedule created successfully") {
+      alert("Schedule created successfully");
+    } else {
+      alert(response.message);
+    }
+    actions.resetForm();
   };
 
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
       <div className="w-1/4 bg-gray-100 p-6">
-        <h1 className="text-2xl font-bold mb-4">Mark Joseph Tiempo</h1>
+        <h1 className="text-2xl font-bold mb-4">{`${username} ${userId}`}</h1>
 
         {/* Create Schedule Form in Sidebar */}
         <div className="bg-gray-200 p-6">
@@ -53,6 +64,48 @@ const UserDashboard = () => {
           >
             {(formikProps) => (
               <Form className="grid grid-cols-1 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                    First Name
+                  </label>
+                  <Field
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    className="mt-1 block w-full border p-2"
+                    placeholder="Enter first name"
+                  />
+                  <ErrorMessage name="firstName" component="div" className="text-red-600" />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                    Last Name
+                  </label>
+                  <Field
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    className="mt-1 block w-full border p-2"
+                    placeholder="Enter last name"
+                  />
+                  <ErrorMessage name="lastName" component="div" className="text-red-600" />
+                </div>
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                    Gender
+                  </label>
+                  <Field
+                    as="select"
+                    id="gender"
+                    name="gender"
+                    className="mt-1 block w-full border p-2"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </Field>
+                  <ErrorMessage name="gender" component="div" className="text-red-600" />
+                </div>
                 <div>
                   <label htmlFor="therapyType" className="block text-sm font-medium text-gray-700">
                     Therapy Type
@@ -114,7 +167,7 @@ const UserDashboard = () => {
       <div className="w-3/4 p-6">
         {/* Schedule Items */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {initialScheduleItems.map((item) => (
+          {/* {initialScheduleItems.map((item) => (
             <div key={item.id} className="border p-4 text-sm shadow-lg bg-white rounded-md">
               <p className="text-gray-800 font-semibold">Name: {item.name}</p>
               <p className="text-gray-600">Gender: {item.gender}</p>
@@ -122,7 +175,7 @@ const UserDashboard = () => {
               <p className="text-gray-600">Schedule: {item.schedule}</p>
               <p className="text-gray-600">Status: {item.status}</p>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
       {/* End of Main Content */}

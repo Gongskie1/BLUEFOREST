@@ -1,20 +1,18 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CustomInput } from "../components";
 import loginProcess from "../process/logic.process";
 import loginSchema from "../schema/loginShema";
 import { initialValuesTypes } from "../types";
 import useCustomFormik from "../utils/formikHooks";
-import { RootState } from "../state/store";
 import { setStatus } from "../state/counter_slice/statusSlice";
 import { useNavigate, Link } from "react-router-dom";
+import { setData } from "../state/counter_slice/userSlice";
 
-type UserType = "user" | "admin";
+// type UserType = "user" | "admin";
 
 const LoginPage = () => {
-  const status = useSelector((state: RootState) => state.status.status);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userType: UserType = "user";
 
   const initialValues = {
     username: "",
@@ -24,16 +22,20 @@ const LoginPage = () => {
   async function onSubmit(values: initialValuesTypes) {
     try {
       const findUser = await loginProcess(values);
-      if (!findUser.status) {
-        dispatch(setStatus(findUser.status));
+      if (!findUser) {
+        dispatch(setStatus(false));
         console.log("Incorrect credentials", findUser);
+        navigate("/login");
       } else {
-        dispatch(setStatus(findUser.status));
-        if (userType === "admin") {
+        dispatch(setStatus(true));
+        dispatch(setData(findUser.data));
+        // Set the entire user data object
+        if (findUser.data.userType === "ADMIN") {
           navigate("/admin");
         } else {
           navigate("/dashboard");
         }
+       console.log("This is else",findUser.data.userType);
       }
     } catch (error) {
       console.log("Onsubmit login error:", error);
@@ -51,7 +53,7 @@ const LoginPage = () => {
       <div className="bg-white shadow-lg rounded-lg w-3/4 lg:w-2/4 flex overflow-hidden">
         <div className="w-full lg:w-1/2 bg-gradient-to-r from-green-500 to-blue-500 p-8 flex flex-col justify-center">
           <h1 className="text-white text-4xl font-bold mb-4">Blue Forest</h1>
-          <h2 className="text-white text-2xl mb-6">Login {status.toString()}</h2>
+          <h2 className="text-white text-2xl mb-6">Login</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <CustomInput inputTitle={"username"} boilerPlate={getFieldProps("username")} />
             {touched.username && errors.username && (

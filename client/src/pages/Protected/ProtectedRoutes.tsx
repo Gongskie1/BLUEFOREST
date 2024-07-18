@@ -10,7 +10,7 @@ type ElementTypeProps = {
 const ProtectedRoutes = ({ children }:ElementTypeProps) => {
   const isAuthenticated = useSelector((state: RootState) => state.status.status);
 
-  return children/* isAuthenticated ? children : <Navigate to="/login" />; */
+  return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 export default ProtectedRoutes;

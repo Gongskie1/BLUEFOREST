@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import statusReducer from "./counter_slice/statusSlice";
+import userCredentials from "./counter_slice/userSlice";
 
 export const store = configureStore({
     reducer:{
-        status:statusReducer
+        status:statusReducer,
+        userData:userCredentials
     }
 });
 

@@ -10,15 +10,15 @@ const endPoints = "http://localhost:8080/login";
 async function loginProcess(values: loginTypes) {
     try {
         const response = await axios.post(endPoints, values);
-        if(!response.data.status){
-            return response.data;
+        if(!response.data.user){
+            return {data:null,status:false};
         }else{
-            return response.data; 
+            return {data:response.data.user,status:true}; 
         }
         
     } catch (error) {
         if(isAxiosError(error)){
-            return error.response?.data;
+            return error.response?.data.user;
         }else{
             throw error; 
         }

@@ -1,35 +1,37 @@
-import { Request, Response } from "express-serve-static-core";
+import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 const scheduleController = {
   create: async (req: Request, res: Response) => {
-    const { gender, firstname, lastname, phoneNumber, therapyType, schedule } = req.body;
-    
+    const { userId, gender, firstName, lastName, phoneNumber, therapyType, dateTime } = req.body;
+
+    // Validate that all fields are provided
+    if (!userId || !gender || !firstName || !lastName || !phoneNumber || !therapyType || !dateTime) {
+      return res.status(400).json({ status: false, message: "Please fill all the inputs" });
+    }
+
+    // Prepare the schedule data
     const scheduleData = {
       data: {
-        gender: gender,
-        userId: 1,
-        firstname: firstname,
-        lastname: lastname,
-        phoneNumber: phoneNumber,
-        schedule:schedule,
-        therapyType: therapyType,
+        userId,
+        gender,
+        firstname: firstName,
+        lastname: lastName,
+        phoneNumber,
+        therapyType,
+        schedule: dateTime,
       },
     };
-    // ghena check niya if naay input na empty
-    if(!gender||!firstname||!lastname||phoneNumber||therapyType||schedule){
-        return res.status(400).json({message:"fill all the inputs"});
-    }
-    // dri mahitabo pag create ug schedule
+
     try {
-    // mao ning ORM sa prisma naga communicate sa mysql
-      const create = await prisma.schedule.create(scheduleData);
-      res.status(200).json({message:"created"});
+      // Create a new schedule
+      await prisma.schedule.create(scheduleData);
+      res.status(201).json({ status: true, message: "Schedule created successfully" });
     } catch (error) {
       console.error("Error creating schedule:", error);
-      res.status(500).send({ error: "Failed to create schedule" });
+      res.status(500).json({ status: false, message: "Failed to create schedule" });
     }
   },
 };

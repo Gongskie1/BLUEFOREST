@@ -41,16 +41,21 @@ export const UserQueries = {
 
     try {
       const findUser = await userRepo.findUserByUsername(username);
+      const data = {
+        id:findUser?.id,
+        username:findUser?.username,
+        userType:findUser?.userType
+      }
 
       if (findUser) {
         const compare = await checkHashPassword(findUser.password, password);
         if (!compare) {
           return res.status(401).json({ message: "Wrong credentials", user: null });
         } else {
-          return res.status(200).json({ message: "Login successful", user: findUser });
+          return res.status(200).json({ message: "Login successful", user: data });
         }
       } else {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({ message: "User not found", user:null });
       }
     } catch (error) {
       console.log("Error during user login:", error);
