@@ -73,7 +73,7 @@ const LoginPage = () => {
                 </div>
 
                 <div>
-                  <CustomInput inputTitle={"password"} boilerPlate={getFieldProps("password")} />
+                  <CustomInput inputTitle={"password"} boilerPlate={getFieldProps("password")} type={"password"} />
                   <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
 

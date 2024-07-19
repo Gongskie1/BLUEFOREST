@@ -2,6 +2,7 @@ import { FieldInputProps } from "formik";
 import { ObjectSchema } from "yup";
 
 export type customInputTypes = {
+    type?:"password"|"button"
     inputTitle:string;
     inputID?:string;
     inputClass?:string;

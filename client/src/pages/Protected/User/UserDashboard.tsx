@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
-import * as Yup from "yup";
+// import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+// import * as Yup from "yup";
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../../state/store";
-import createSchedule from "../../../process/create-schedule.process";
+// import createSchedule from "../../../process/create-schedule.process";
 import axios from 'axios';
+import CreateSchedule from "./CreateSchedule";
+import { subDays } from "date-fns";
 
 type ScheduleType = {
   id: number;
@@ -12,6 +14,7 @@ type ScheduleType = {
   lastname: string;
   gender: string;
   phoneNumber: string;
+  therapyType:string;
   schedule: string;
   status:string;
 };
@@ -22,15 +25,15 @@ type user = {
   userType:string;
 }
 
-type initialValuesTypes = {
-  userId: number;
-  therapyType: string;
-  phoneNumber: string;
-  dateTime: string;
-  firstName: string;
-  lastName: string;
-  gender: string;
-};
+// type initialValuesTypes = {
+//   userId: number;
+//   therapyType: string;
+//   phoneNumber: string;
+//   dateTime: string;
+//   firstName: string;
+//   lastName: string;
+//   gender: string;
+// };
 
 const UserDashboard = () => {
   // const userId = useSelector((state: RootState) => state.userData.id);
@@ -39,38 +42,38 @@ const UserDashboard = () => {
   const userDataString = localStorage.getItem("data");
   const userData:user = userDataString ? JSON.parse(userDataString) : null;
   const userId = userData.id;
-  const initialValues: initialValuesTypes = {
+  // const initialValues: initialValuesTypes = {
     
-    userId,
-    therapyType: "",
-    phoneNumber: "",
-    dateTime: "",
-    firstName: "",
-    lastName: "",
-    gender: "",
-  };
+  //   userId,
+  //   therapyType: "",
+  //   phoneNumber: "",
+  //   dateTime: "",
+  //   firstName: "",
+  //   lastName: "",
+  //   gender: "",
+  // };
 
-  const validationSchema = Yup.object({
-    therapyType: Yup.string().required("Therapy Type is required"),
-    phoneNumber: Yup.string().required("Phone Number is required"),
-    dateTime: Yup.date().required("Date and Time are required").nullable(),
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    gender: Yup.string().required("Gender is required"),
-  });
+  // const validationSchema = Yup.object({
+  //   therapyType: Yup.string().required("Therapy Type is required"),
+  //   phoneNumber: Yup.string().required("Phone Number is required"),
+  //   dateTime: Yup.date().required("Date and Time are required").nullable(),
+  //   firstName: Yup.string().required("First Name is required"),
+  //   lastName: Yup.string().required("Last Name is required"),
+  //   gender: Yup.string().required("Gender is required"),
+  // });
 
-  const handleSubmit = async (values: initialValuesTypes, actions: FormikHelpers<initialValuesTypes>) => {
-    const response = await createSchedule(values);
-    // console.log(response);
-    if (response.status === 'success') {
-      alert(response.message);
-      fetchSchedules(userId); // Fetch schedules after successfully creating a new schedule
-    } else {
-      alert(response.message || 'An error occurred');
-    }
-    actions.setSubmitting(false);
-    actions.resetForm();
-  };
+  // const handleSubmit = async (values: initialValuesTypes, actions: FormikHelpers<initialValuesTypes>) => {
+  //   const response = await createSchedule(values);
+  //   // console.log(response);
+  //   if (response.status === 'success') {
+  //     alert(response.message);
+  //     fetchSchedules(userId); // Fetch schedules after successfully creating a new schedule
+  //   } else {
+  //     alert(response.message || 'An error occurred');
+  //   }
+  //   actions.setSubmitting(false);
+  //   actions.resetForm();
+  // };
 
   const fetchSchedules = async (userId: number) => {
     
@@ -99,25 +102,25 @@ const UserDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.reload();
-  };
+  // const handleLogout = () => {
+  //   localStorage.clear();
+  //   window.location.reload();
+  // };
 
   useEffect(() => {
     fetchSchedules(userId);
   }, [userId]);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen ">
       
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 p-6">
+      <div className="w-1/4 bg-gray-100 p-6 overflow-auto">
         {/* <h1 className="text-2xl font-bold mb-4">{`${username} ${userId}`}</h1> */}
 
         {/* Create Schedule Form in Sidebar */}
         <div className="bg-gray-200 p-6">
-          <h2 className="text-xl font-bold mb-2">Create New Schedule</h2>
+          {/* <h2 className="text-xl font-bold mb-2">Create New Schedule</h2>
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -220,34 +223,45 @@ const UserDashboard = () => {
               </Form>
             )}
           </Formik>
-          
-        </div>
-        <div className="mt-4">
+          <div className="mt-4">
           <button
             onClick={handleLogout}
             className="bg-red-500 px-4 py-2 rounded-md text-white hover:bg-red-600 w-full"
           >
             Logout
           </button>
+        </div> */}
         </div>
+        
       </div>
       {/* End of Sidebar */}
 
       {/* Main Content */}
-      <div className="w-3/4 p-6">
+      <div className="w-3/4 p-6 h-full">
         {/* Schedule Items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* {{<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {schedules.map((schedule) => (
             <div key={schedule.id} className="border p-4 text-sm shadow-lg bg-white rounded-md">
               <p className="text-gray-800 font-semibold">Name: {schedule.firstname} {schedule.lastname}</p>
               <p className="text-gray-600">Gender: {schedule.gender}</p>
               <p className="text-gray-600">Phone Number: {schedule.phoneNumber}</p>
+              <p className="text-gray-600">Therapy Type: {schedule.therapyType}</p>
               <p className="text-gray-600">DateTime: {schedule.schedule}</p>
               <p className="text-gray-600">status: {schedule.status}</p>
             </div>
           ))
         }
-        </div>
+        </div>}} */}
+        <CreateSchedule 
+        events={[
+          { date: subDays(new Date(), 10), title: "Post video"},
+          { date: subDays(new Date(), 13), title: "Lezgow mdfk"},
+
+          { date: subDays(new Date(), 6), title: "Post video" },
+          { date: subDays(new Date(), 1), title: "Edit video" },
+          // { date: addDays(new Date(), 3), title: "Code" },
+         
+        ]} />
       </div>
       {/* End of Main Content */}
     </div>
