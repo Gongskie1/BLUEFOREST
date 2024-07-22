@@ -20,20 +20,33 @@ const prisma = new client_1.PrismaClient();
 const userRepo = new UserRepo_1.default(prisma);
 exports.UserQueries = {
     createUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const { username, password } = req.body;
-        if (!username || !password) {
+        const { username, password, userType, email, cellno, gender, address } = req.body;
+        // Validate required fields
+        if (!username || !password || !email || !cellno || !gender || !address) {
             return res.status(400).json({ status: false, message: "Please fill all the fields." });
         }
         try {
-            const findUser = yield userRepo.findUserByUsername(username);
-            if (!findUser) {
-                const hash = yield (0, bcrypt_1.hashPassword)(password);
-                yield userRepo.createUser({ username, password: hash });
-                return res.status(201).json({ status: true, message: "User created" });
-            }
-            else {
+            // Check if user already exists
+            const existingUser = yield prisma.user.findUnique({
+                where: { username },
+            });
+            if (existingUser) {
                 return res.status(400).json({ status: false, message: "User already exists" });
             }
+            // Hash the password
+            const hashedPassword = yield (0, bcrypt_1.hashPassword)(password);
+            yield prisma.user.create({
+                data: {
+                    username,
+                    password: hashedPassword,
+                    userType,
+                    email,
+                    cellno,
+                    gender,
+                    address,
+                },
+            });
+            return res.status(201).json({ status: true, message: "User created" });
         }
         catch (error) {
             console.error("Error in createUser:", error);
@@ -51,7 +64,9 @@ exports.UserQueries = {
             const data = {
                 id: findUser === null || findUser === void 0 ? void 0 : findUser.id,
                 username: findUser === null || findUser === void 0 ? void 0 : findUser.username,
-                userType: findUser === null || findUser === void 0 ? void 0 : findUser.userType
+                userType: findUser === null || findUser === void 0 ? void 0 : findUser.userType,
+                email: findUser === null || findUser === void 0 ? void 0 : findUser.email,
+                cellno: findUser === null || findUser === void 0 ? void 0 : findUser.cellno
             };
             if (findUser) {
                 const compare = yield (0, bcrypt_1.checkHashPassword)(findUser.password, password);

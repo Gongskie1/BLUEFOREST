@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AboutPage, AdminDashboard, HomePage, LandingPage, LoginPage, ProtectedRoutes, TreatmentPage, UserDashboard } from "./pages";
 import CreateAccountPage from "./pages/CreateAccountPage";
+import AuditLogs from "./pages/Protected/Admin/AuditLogs";
+import Admin from "./pages/Protected/Admin/Admin";
 
 const router = createBrowserRouter([
     // Public routes
@@ -36,7 +38,17 @@ const router = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: <ProtectedRoutes children={<AdminDashboard />} />
+        element: <ProtectedRoutes children={<AdminDashboard />} />,
+        children:[
+            {
+                path:"/admin/audit",
+                element:<AuditLogs/>
+            },
+            {
+                path:"/admin",
+                element:<Admin/>
+            }
+        ]
     },
     {
         path: "*",

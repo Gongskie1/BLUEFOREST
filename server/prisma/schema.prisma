@@ -28,21 +28,42 @@ model User {
   username  String     @unique
   password  String
   userType  String     @default("REGULAR")
-  schedules Schedule[]
+  email     String
+  cellno    String
+  gender    String
+  address   String
+  schedules Schedule[] // One-to-many relationship with Schedule
+  auditLogs AuditLog[] // One-to-many relationship with AuditLog
 }
 
 model Schedule {
   id          Int      @id @default(autoincrement())
-  status      String   @default("Pending")
-  userId      Int
-  gender      String
-  firstname   String
-  lastname    String
-  phoneNumber String
-  schedule    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  status      String   @default("Pending") // Default value for schedule status
+  quantity    Int      @default(1) // Default value for quantity
+  userId      Int // Foreign key to User
+  year        Int
+  month       String // Month as a string (e.g., "January")
+  day         Int
+  time        String
+  createdAt   DateTime @default(now()) // Automatically set to current date/time on creation
+  updatedAt   DateTime @updatedAt // Automatically updated to current date/time on modification
+  user        User     @relation(fields: [userId], references: [id]) // Relation to User
+  therapyType String
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  action      String // Describes the action taken (e.g., "Accepted", "Deleted")
+  status      String   @default("Pending") // Default value for log status
+  quantity    Int      @default(1) // Default value for quantity
+  userId      Int // Foreign key to User
+  year        Int
+  month       String // Month as a string (e.g., "January")
+  day         Int
+  time        String
+  createdAt   DateTime @default(now()) // Automatically set to current date/time on creation
+  updatedAt   DateTime @updatedAt // Automatically updated to current date/time on modification
+  user        User     @relation(fields: [userId], references: [id]) // Relation to User
   therapyType String
 }
 

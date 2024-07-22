@@ -9,22 +9,39 @@ const userRepo = new UserRepository(prisma);
 
 export const UserQueries = {
   createUser: async (req: Request, res: Response) => {
-    const { username, password } = req.body;
-  
-    if (!username || !password) {
+    const { username, password,userType, email, cellno, gender, address } = req.body;
+
+    // Validate required fields
+    if (!username || !password || !email || !cellno || !gender || !address) {
       return res.status(400).json({ status: false, message: "Please fill all the fields." });
     }
-  
+
     try {
-      const findUser = await userRepo.findUserByUsername(username);
-  
-      if (!findUser) {
-        const hash = await hashPassword(password);
-        await userRepo.createUser({ username, password: hash });
-        return res.status(201).json({ status: true, message: "User created" });
-      } else {
+      // Check if user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { username },
+      });
+
+      if (existingUser) {
         return res.status(400).json({ status: false, message: "User already exists" });
       }
+
+      // Hash the password
+      const hashedPassword = await hashPassword(password);
+
+      await prisma.user.create({
+        data: {
+          username,
+          password: hashedPassword,
+          userType,
+          email,
+          cellno,
+          gender,
+          address,
+        },
+      });
+
+      return res.status(201).json({ status: true, message: "User created" });
     } catch (error) {
       console.error("Error in createUser:", error);
       return res.status(500).json({ status: false, message: "Internal Server Error" });
@@ -44,7 +61,9 @@ export const UserQueries = {
       const data = {
         id:findUser?.id,
         username:findUser?.username,
-        userType:findUser?.userType
+        userType:findUser?.userType,
+        email: findUser?.email,
+        cellno: findUser?.cellno
       }
 
       if (findUser) {

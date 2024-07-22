@@ -11,4 +11,5 @@ schedule.get("/schedule", create_schedule_controller_1.default.displayAll);
 schedule.get("/schedule/:id", create_schedule_controller_1.default.display);
 schedule.put("/schedule/:id/accept", create_schedule_controller_1.default.acceptSchedule);
 schedule.delete("/schedule/:id", create_schedule_controller_1.default.deleteSchedule);
+schedule.get("/audit-log", create_schedule_controller_1.default.getAuditLogs);
 exports.default = schedule;
